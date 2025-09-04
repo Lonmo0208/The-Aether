@@ -1,7 +1,9 @@
 plugins {
-    id 'java'
-    id 'fabric-loom' version '1.11.6'
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
     id 'maven-publish'
+    id 'net.neoforged.moddev' version "${moddevgradle_version}"
     id 'io.github.0ffz.github-packages' version '[1,2)'
     id 'com.matthewprenger.cursegradle' version '[1.4,1.5)'
     id 'com.modrinth.minotaur' version '[2,3)'
@@ -11,61 +13,214 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = "${minecraft_version}-${mod_version}"
+version = "${minecraft_version}-${mod_version}-neoforge"
 group = mod_group
 
 base {
     archivesName = mod_id
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'owo.forceDisableDebug', 'true'
+            logLevel = org.slf4j.event.Level.INFO
+        }
+
+        client {
+            client()
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        server {
+            server()
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
+            programArgument '--nogui'
+        }
+
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+        }
+
+        clientData {
+            clientData()
+            programArguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath(), '--existing', file('src/generated/resources/').getAbsolutePath()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
     }
 }
 
-repositories {
-    maven { url = "https://maven.wispforest.io" }
-    maven { url = "https://maven.fabricmc.net" }
-    maven { url = "https://maven.neoforged.net/releases" }
-    maven { url = "https://maven.the-aether-team.com/releases" }
-    mavenCentral()
-    mavenLocal()
-}
-
-dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
-    modImplementation "io.wispforest:owo-lib:0.12.22+1.21.8"
-    modImplementation "io.wispforest:accessories-fabric:1.1.0-beta.48+1.21.1"
-    modImplementation "com.aetherteam.nitrogen:nitrogen_internals:1.2.5"
-    compileOnly "net.neoforged:neoforge:21.4.41-beta"
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
 }
 
 processResources {
-    inputs.property "mod_id", mod_id
-    inputs.property "mod_name", mod_name
-    inputs.property "mod_version", mod_version
-    inputs.property "mod_license", mod_license
-    inputs.property "mod_url", mod_url
-    inputs.property "mod_tracker", mod_tracker
-    inputs.property "mod_description", mod_description
-    inputs.property "minecraft_version_range", minecraft_version_range
-    inputs.property "loader_version_range", loader_version_range
-    filesMatching("fabric.mod.json") {
-        expand([
-            mod_id: mod_id,
-            mod_name: mod_name,
-            mod_version: mod_version,
-            mod_license: mod_license,
-            mod_url: mod_url,
-            mod_tracker: mod_tracker,
-            mod_description: mod_description,
-            minecraft_version_range: minecraft_version_range,
-            loader_version_range: loader_version_range
-        ])
-    }
     exclude '.cache/'
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    implementation "com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}"
+    implementation "com.aetherteam.cumulus:cumulus_menus:${project.cumulus_version}"
+    implementation "io.wispforest:accessories-neoforge:${project.accessories_version}+1.21.8"
+
+    jarJar("com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}") {
+        version {
+            strictly "[${project.nitrogen_version},)"
+            prefer "${project.nitrogen_version}"
+        }
+    }
+
+    jarJar("com.aetherteam.cumulus:cumulus_menus:${project.cumulus_version}") {
+        version {
+            strictly "[${project.cumulus_version},)"
+            prefer "${project.cumulus_version}"
+        }
+    }
+
+    jarJar("io.wispforest:accessories-neoforge:${project.accessories_version}+1.21.8") {
+        version {
+            strictly "[${project.accessories_version}+1.21.8,)"
+            prefer "${project.accessories_version}+1.21.8"
+        }
+    }
+
+    compileOnly "curse.maven:jade-324717:${project.jade_version}"
+    compileOnly "curse.maven:lootr-361276:${project.lootr_version}"
+
+}
+
+repositories {
+    maven { url = "https://jitpack.io" }
+    maven { url = "https://maven.blamejared.com" }
+    maven { url = "https://www.cursemaven.com" }
+    maven { url = "https://dvs1.progwml6.com/files/maven/" }
+    maven { url = "https://gitlab.com/api/v4/projects/21830712/packages/maven" }
+    maven { url = "https://maven.wispforest.io" }
+    maven { url = "https://maven.wispforest.io/releases" }
+    maven { url = "https://maven.shedaniel.me/" }
+    maven { url = "https://maven.fabricmc.net" }
+    maven { url = "https://maven.su5ed.dev/releases" }
+    maven { url = "https://packages.aether-mod.net/Nitrogen" }
+    maven { url = "https://packages.aether-mod.net/Cumulus" }
+    mavenLocal()
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_version            : mod_version,
+        mod_license            : mod_license,
+        mod_url                : mod_url,
+        mod_update             : mod_update,
+        mod_tracker            : mod_tracker,
+        mod_credits            : mod_credits,
+        mod_authors            : mod_authors,
+        mod_description        : mod_description,
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version            : neo_version,
+        neo_version_range      : neo_version_range,
+        loader_version_range   : loader_version_range
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.compilerArgs << "-Xmaxerrs" << "9000"
+}
+
+tasks.register('sourceJar', Jar) {
+    dependsOn 'classes'
+    from sourceSets.main.allSource
+    archiveClassifier = 'sources'
+}
+
+compileJava {
+    options.incremental = false
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId project.archivesBaseName
+            artifact project.tasks.jar
+            artifact project.sourceJar
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/The-Aether-Team/The-Aether"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+curseforge {
+    project {
+        apiKey = System.getenv("CURSEFORGE_TOKEN")
+        id = "${curseforge_id}"
+        releaseType = "${version_type}"
+        changelog = file("$rootDir/docs/CHANGELOG.md")
+        changelogType = "markdown"
+        addGameVersion("${minecraft_version}")
+        addGameVersion("NeoForge")
+        mainArtifact(tasks.jar) {
+            displayName = "${project.mod_name} - ${version}"
+            relations {
+                requiredDependency "owo-lib"
+                embeddedLibrary "accessories"
+                embeddedLibrary "cumulus"
+            }
+        }
+    }
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "${modrinth_id}"
+    versionNumber = "${version}"
+    versionType = "${version_type}"
+    versionName = "${mod_name} - ${version}"
+    changelog = new File("$rootDir/docs/CHANGELOG.md").text
+    uploadFile = tasks.jar
+    gameVersions = ["${minecraft_version}"]
+    loaders = ["neoforge"]
+    dependencies {
+        required.project "owo-lib"
+        embedded.version "accessories", "${project.accessories_version}+${project.minecraft_version}"
+        embedded.version "cumulus", "${project.cumulus_version}"
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }
