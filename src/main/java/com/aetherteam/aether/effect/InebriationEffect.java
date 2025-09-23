@@ -40,28 +40,23 @@ public class InebriationEffect extends MobEffect {
      * @param livingEntity The affected {@link LivingEntity}.
      */
     private void distractEntity(LivingEntity livingEntity) {
-        if(livingEntity instanceof Player player && checkNonSurvivalFlight(player)) return;
+        if (!(livingEntity instanceof Player player) || (!player.isCreative() && !player.isSpectator()) || !player.getAbilities().flying) { // Disallow motion effects during creative/spectator flight.
+            double gaussian = livingEntity.level().getRandom().nextGaussian();
+            double newMotionDirection = 0.1 * gaussian;
+            double newRotationDirection = (Math.PI / 4.0) * gaussian;
 
-        double gaussian = livingEntity.level().getRandom().nextGaussian();
-        double newMotionDirection = 0.1 * gaussian;
-        double newRotationDirection = (Math.PI / 4.0) * gaussian;
+            this.motionDirection = 0.2 * newMotionDirection + 0.8 * this.motionDirection;
+            livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(this.motionDirection, 0, this.motionDirection));
 
-        this.motionDirection = 0.2 * newMotionDirection + 0.8 * this.motionDirection;
-        livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(this.motionDirection, 0, this.motionDirection));
-
-        this.rotationDirection = 0.125 * newRotationDirection + (1.0 - 0.125) * this.rotationDirection;
-        livingEntity.setYRot((float) (livingEntity.getYRot() + this.rotationDirection));
-        livingEntity.setXRot((float) (livingEntity.getXRot() + this.rotationDirection));
-
+            this.rotationDirection = 0.125 * newRotationDirection + (1.0 - 0.125) * this.rotationDirection;
+            livingEntity.setYRot((float) (livingEntity.getYRot() + this.rotationDirection));
+            livingEntity.setXRot((float) (livingEntity.getXRot() + this.rotationDirection));
+        }
         if (livingEntity.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, Items.PURPLE_DYE.getDefaultInstance()),
                     livingEntity.getX(), livingEntity.getY() + livingEntity.getBbHeight() * 0.8, livingEntity.getZ(),
                     1, 0.0, 0.0, 0.0, 0.0);
         }
-    }
-
-    private boolean checkNonSurvivalFlight(Player player) {
-        return (player.isCreative() || player.isSpectator()) && player.getAbilities().flying;
     }
 
     @Override
