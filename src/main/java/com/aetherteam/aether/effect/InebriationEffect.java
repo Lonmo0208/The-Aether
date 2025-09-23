@@ -35,7 +35,7 @@ public class InebriationEffect extends MobEffect {
 
     /**
      * Distraction code for Inebriation, which randomly modifies the affected entity's motion and rotation, moving them around and rotating their camera.
-     * It also spawns red dye particles from the player's head position.
+     * It also spawns purple dye particles from the player's head position.
      *
      * @param livingEntity The affected {@link LivingEntity}.
      */
