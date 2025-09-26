@@ -1,3 +1,32 @@
+# The Aether - NeoForge - 1.21.1-1.5.10
+
+Additions
+
+- Added custom recipe book filter icon sprites for the Altar, Freezer, and Incubator.
+- Added a new common config option `"Enables Immersive Portals compatibility"` to toggle compatibility while Immersive Portals is installed.
+- Added new block tags: `ores/ambrosium`, `ores/zanite`, `ores/gravitite`, `storage_blocks/ambrosium`, and `storage_block/zanite`.
+- Added new item tags: `gems/ambrosium`, `ores/ambrosium`, `ores/zanite`, and `ores/gravitite`.
+- Added special dungeon blocks to the `#c:relocation_not_supported` tag.
+- Added Stripped Skyroot Log and Stripped Skyroot Wood to the `#c:stripped_logs` and `#c:stripped_woods` respectively.
+- Added `#aether:phyg_temptation_items`, `#aether:flying_cow_temptation_items`, `#aether:sheepuff_temptation_items`, `#aether:aerbunny_temptation_items`, `#aether:aerbunny_temptation_items`, and `#aether:moa_food_items` to the `#c:animal_foods` item tag.
+- Added Healing Stone to the `#c:foods` item tag.
+- Added Ambrosium Shard to the `#c:gems` item tag.
+- Added Aether Portal Frame to the `#c:hidden_from_recipe_viewers` item tag.
+
+Changes
+
+- Reworked the assets of the Aether's title screen to be higher quality and the code to be more compatible with mods like Essential that add buttons to the screen.
+- Inebriation's movement effects no longer apply to flying players in Creative and Spectator mode.
+
+Fixes
+
+- Fix the Valkyrie Lance accepting Sweeping Edge when it shouldn't.
+- Fix the Cloud Staff not accepting durability-related enchantments.
+- Fix the Dart Shooter not accepting durability-related enchantments and not disallowing Infinity and Flame.
+- Fix Blue Aerclouds not being moveable by Create contraptions.
+- Fix changing the `"Overworld-length Aether time cycle"` and `"Syncs time cycles"` configs not working in-game.
+- Fix a crash when trying to change the color of contributor perks.
+
 # The Aether - NeoForge - 1.21.1-1.5.9
 
 Additions
