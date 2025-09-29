@@ -2,6 +2,8 @@ package com.aetherteam.aether.perk.types;
 
 import com.aetherteam.aether.Aether;
 import com.aetherteam.aether.api.registers.MoaType;
+import com.aetherteam.aether.client.renderer.entity.sub.MoaSubRenderer;
+import com.aetherteam.aether.client.renderer.entity.sub.VoidMoaSubRenderer;
 import com.aetherteam.aether.data.resources.registries.AetherMoaTypes;
 import com.aetherteam.aether.perk.PerkUtil;
 import com.aetherteam.nitrogen.api.users.User;
@@ -352,6 +354,14 @@ public class MoaSkins {
             .saddleLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/prehistoric_moa/prehistoric_moa_saddle.png"))
             .info(new MoaSkin.Info(User.Tier.VALKYRIE, false))
         ));
+        register("void_moa", new MoaSkin("void_moa", new MoaSkin.Properties()
+            .displayName(Component.translatable("gui.aether.moa_skins.skin.void_moa"))
+            .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
+            .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/void_moa_icon"))
+            .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/void_moa/void_moa.png"))
+            .subRenderer(new VoidMoaSubRenderer())
+            .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
+        ));
     }
 
     private static void register(String id, MoaSkin moaSkin) {
@@ -402,13 +412,15 @@ public class MoaSkins {
         private final ResourceLocation saddleLocation;
         @Nullable
         private final ResourceLocation saddleEmissiveLocation;
+        @Nullable
+        private final MoaSubRenderer subRenderer;
         private final Info info;
 
         protected MoaSkin(String id, Properties properties) {
-            this(id, properties.displayName, properties.userPredicate, properties.iconLocation, properties.skinLocation, properties.emissiveLocation, properties.hatLocation, properties.hatEmissiveLocation, properties.saddleLocation, properties.saddleEmissiveLocation, properties.info);
+            this(id, properties.displayName, properties.userPredicate, properties.iconLocation, properties.skinLocation, properties.emissiveLocation, properties.hatLocation, properties.hatEmissiveLocation, properties.saddleLocation, properties.saddleEmissiveLocation, properties.subRenderer, properties.info);
         }
 
-        protected MoaSkin(String id, Component displayName, Predicate<User> userPredicate, ResourceLocation iconLocation, ResourceLocation skinLocation, ResourceLocation emissiveLocation, ResourceLocation hatLocation, ResourceLocation hatEmissiveLocation, ResourceLocation saddleLocation, ResourceLocation saddleEmissiveLocation, Info info) {
+        protected MoaSkin(String id, Component displayName, Predicate<User> userPredicate, ResourceLocation iconLocation, ResourceLocation skinLocation, ResourceLocation emissiveLocation, ResourceLocation hatLocation, ResourceLocation hatEmissiveLocation, ResourceLocation saddleLocation, ResourceLocation saddleEmissiveLocation, MoaSubRenderer subRenderer, Info info) {
             this.id = id;
             this.displayName = displayName;
             this.userPredicate = userPredicate;
@@ -419,6 +431,7 @@ public class MoaSkins {
             this.hatEmissiveLocation = hatEmissiveLocation;
             this.saddleLocation = saddleLocation;
             this.saddleEmissiveLocation = saddleEmissiveLocation;
+            this.subRenderer = subRenderer;
             this.info = info;
         }
 
@@ -494,6 +507,11 @@ public class MoaSkins {
             return this.saddleEmissiveLocation;
         }
 
+        @Nullable
+        public MoaSubRenderer getSubRenderer() {
+            return this.subRenderer;
+        }
+
         /**
          * @return The Patreon {@link com.aetherteam.nitrogen.api.users.User.Tier} and lifetime {@link Boolean} {@link Info} of the {@link MoaSkin}.
          */
@@ -515,6 +533,8 @@ public class MoaSkins {
             private ResourceLocation saddleLocation;
             @Nullable
             private ResourceLocation saddleEmissiveLocation = null;
+            @Nullable
+            private MoaSubRenderer subRenderer = null;
             private Info info;
 
             /**
@@ -586,6 +606,14 @@ public class MoaSkins {
              */
             public Properties saddleEmissiveLocation(ResourceLocation saddleEmissiveLocation) {
                 this.saddleEmissiveLocation = saddleEmissiveLocation;
+                return this;
+            }
+
+            /**
+             * @see MoaSkin#getSubRenderer()
+             */
+            public Properties subRenderer(MoaSubRenderer subRenderer) {
+                this.subRenderer = subRenderer;
                 return this;
             }
 

@@ -120,6 +120,8 @@ public class AetherClient {
         neoBus.addListener(AetherRecipeCategories::registerRecipeCategories);
         neoBus.addListener(AetherParticleTypes::registerParticleFactories);
         neoBus.addListener(AetherOverlays::registerOverlays);
+        neoBus.addListener(AetherRenderTypes::registerRenderBuffers);
+        neoBus.addListener(AetherShaders::registerShaders);
         neoBus.addListener(AetherRenderers::registerEntityRenderers);
         neoBus.addListener(AetherRenderers::registerLayerDefinitions);
         neoBus.addListener(AetherRenderers::addEntityLayers);
