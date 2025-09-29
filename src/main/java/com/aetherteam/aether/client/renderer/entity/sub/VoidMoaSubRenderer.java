@@ -19,12 +19,6 @@ public class VoidMoaSubRenderer implements MoaSubRenderer {
         layerModel.prepareMobModel(moa, limbSwing, limbSwingAmount, partialTicks);
         layerModel.setupAnim(moa, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         VertexConsumer consumer = buffer.getBuffer(AetherRenderTypes.voidMoa());
-//        layerModel.parts().forEach((part) -> {
-//            part.xScale = 0.99F;
-//            part.yScale = 0.99F;
-//            part.zScale = 0.99F;
-//        });
-//        RenderSystem.colorMask(true, true, true, false);
         layerModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
