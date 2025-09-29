@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.event.RegisterRenderBuffersEvent;
 
 public class AetherRenderTypes {
     public static final RenderType VOID_MOA = RenderType.create("aether:void_moa",
-        DefaultVertexFormat.POSITION_TEX,
+        DefaultVertexFormat.NEW_ENTITY,
         VertexFormat.Mode.QUADS,
         1536,
         false,
@@ -20,12 +20,12 @@ public class AetherRenderTypes {
         RenderType.CompositeState.builder()
             .setShaderState(new RenderStateShard.ShaderStateShard(AetherShaders::getVoidMoaShader))
             .setTextureState(RenderStateShard.MultiTextureStateShard.builder()
-//                .add(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/void_moa/void_moa.png"), false, false)
+                .add(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/void_moa/void_moa.png"), false, false)
 //                .add(ItemRenderer.ENCHANTED_GLINT_ITEM, true, false)
                 .add(TheEndPortalRenderer.END_SKY_LOCATION, false, false)
-//                .add(TheEndPortalRenderer.END_PORTAL_LOCATION, false, false)
+                .add(TheEndPortalRenderer.END_PORTAL_LOCATION, false, false)
                 .build())
-            .setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+//            .setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
             .setWriteMaskState(RenderType.COLOR_WRITE)
             .setCullState(RenderType.NO_CULL)
             .setDepthTestState(RenderType.EQUAL_DEPTH_TEST)

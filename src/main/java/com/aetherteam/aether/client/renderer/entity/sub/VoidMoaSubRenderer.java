@@ -25,7 +25,7 @@ public class VoidMoaSubRenderer implements MoaSubRenderer {
 //            part.zScale = 0.99F;
 //        });
 //        RenderSystem.colorMask(true, true, true, false);
-//        layerModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
+        layerModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 }

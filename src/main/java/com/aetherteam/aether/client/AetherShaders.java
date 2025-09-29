@@ -15,7 +15,7 @@ public class AetherShaders {
     public static void registerShaders(RegisterShadersEvent event) {
         ResourceProvider resourceProvider = event.getResourceProvider();
         try {
-            event.registerShader(new ShaderInstance(resourceProvider, ResourceLocation.fromNamespaceAndPath(Aether.MODID, "void_moa"), DefaultVertexFormat.POSITION_COLOR), instance -> voidMoaShader = instance);
+            event.registerShader(new ShaderInstance(resourceProvider, ResourceLocation.fromNamespaceAndPath(Aether.MODID, "void_moa"), DefaultVertexFormat.NEW_ENTITY), instance -> voidMoaShader = instance);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
