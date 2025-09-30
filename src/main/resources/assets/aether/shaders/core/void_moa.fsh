@@ -56,8 +56,8 @@ mat4 end_portal_layer(float layer) {
 out vec4 fragColor;
 
 void main() {
-    vec4 texels = texture(Sampler0, texCoord0);
-    if (texels.r > 0 && texels.g > 0 && texels.b > 0) {
+    vec4 base = texture(Sampler0, texCoord0);
+    if (base.r > 0 && base.g > 0 && base.b > 0) {
         discard;
     }
     vec3 color = textureProj(Sampler1, texProj0).rgb * COLORS[0];
