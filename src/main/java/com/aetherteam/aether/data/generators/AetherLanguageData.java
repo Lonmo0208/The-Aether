@@ -1327,6 +1327,7 @@ public class AetherLanguageData extends AetherLanguageProvider {
         this.addCommonConfig("data_pack", "add_temporary_freezing_automatically", "Sets the Aether Temporary Freezing data pack to be added to new worlds automatically");
         this.addCommonConfig("data_pack", "add_ruined_portal_automatically", "Sets the Aether Ruined Portals data pack to be added to new worlds automatically");
 
+        this.addCommonConfig("modpack", "randomize_boss_names", "Determines whether bosses should display a randomized name above their boss bar");
         this.addCommonConfig("modpack", "enable_immersive_portals_compatibility", "Enables code and data pack features used for modifying Aether Portals when Immersive Portals is installed");
 
 
