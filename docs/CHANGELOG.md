@@ -1,3 +1,9 @@
+# The Aether - Fabric - 1.21.1-1.5.11
+
+Fixes
+
+- Fix oversight in missing `gems/ambrosium` tag.
+
 # The Aether - Fabric - 1.21.1-1.5.10
 
 Additions
