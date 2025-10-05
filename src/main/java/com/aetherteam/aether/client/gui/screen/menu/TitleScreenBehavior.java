@@ -28,6 +28,9 @@ public interface TitleScreenBehavior {
                 } else if (buttonText.equals(Component.translatable("options.language"))) {
                     button.setX(titleScreen.width - 24 + xOffset);
                     button.setY(4);
+                } else if (buttonText.equals(Component.literal("<essential_partner_integration_button>"))) {
+                    button.setX(titleScreen.width - 72 + xOffset);
+                    button.setY(4);
                 }
                 if (TitleScreenBehavior.isImageButton(buttonText) && ((AbstractWidgetAccessor) button).aether$getAlpha() > 0.01) { // Alpha check fixes button offset bug when menu first opens.
                     button.visible = true;
