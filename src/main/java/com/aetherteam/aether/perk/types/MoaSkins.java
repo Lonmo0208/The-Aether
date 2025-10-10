@@ -2,6 +2,8 @@ package com.aetherteam.aether.perk.types;
 
 import com.aetherteam.aether.Aether;
 import com.aetherteam.aether.api.registers.MoaType;
+import com.aetherteam.aether.client.renderer.entity.sub.PotteryMoaSubRenderer;
+import com.aetherteam.aether.client.renderer.entity.sub.GalaxianMoaSubRenderer;
 import com.aetherteam.aether.client.renderer.entity.sub.MoaSubRenderer;
 import com.aetherteam.aether.client.renderer.entity.sub.VoidMoaSubRenderer;
 import com.aetherteam.aether.data.resources.registries.AetherMoaTypes;
@@ -354,12 +356,28 @@ public class MoaSkins {
             .saddleLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/prehistoric_moa/prehistoric_moa_saddle.png"))
             .info(new MoaSkin.Info(User.Tier.VALKYRIE, false))
         ));
+        register("pottery_moa", new MoaSkin("pottery_moa", new MoaSkin.Properties()
+            .displayName(Component.translatable("gui.aether.moa_skins.skin.pottery_moa"))
+            .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
+            .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/pottery_moa_icon"))
+            .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/pottery_moa/pottery_moa.png"))
+            .subRenderer(new PotteryMoaSubRenderer())
+            .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
+        ));
         register("void_moa", new MoaSkin("void_moa", new MoaSkin.Properties()
             .displayName(Component.translatable("gui.aether.moa_skins.skin.void_moa"))
             .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
             .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/void_moa_icon"))
             .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/void_moa/void_moa.png"))
             .subRenderer(new VoidMoaSubRenderer())
+            .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
+        ));
+        register("galaxian_moa", new MoaSkin("galaxian_moa", new MoaSkin.Properties()
+            .displayName(Component.translatable("gui.aether.moa_skins.skin.galaxian_moa"))
+            .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
+            .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/galaxian_moa_icon"))
+            .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/galaxian_moa/galaxian_moa.png"))
+            .subRenderer(new GalaxianMoaSubRenderer())
             .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
         ));
     }

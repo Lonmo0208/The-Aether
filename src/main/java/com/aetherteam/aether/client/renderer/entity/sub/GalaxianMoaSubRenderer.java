@@ -8,14 +8,14 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 
-public class VoidMoaSubRenderer implements MoaSubRenderer {
+public class GalaxianMoaSubRenderer implements MoaSubRenderer {
     @Override
     public void render(MoaModel parentModel, MoaModel layerModel, PoseStack poseStack, MultiBufferSource buffer, int packedLight, Moa moa, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         poseStack.pushPose();
         parentModel.copyPropertiesTo(layerModel);
         layerModel.prepareMobModel(moa, limbSwing, limbSwingAmount, partialTicks);
         layerModel.setupAnim(moa, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        VertexConsumer consumer = buffer.getBuffer(AetherRenderTypes.voidMoa());
+        VertexConsumer consumer = buffer.getBuffer(AetherRenderTypes.galaxianMoa());
         layerModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
