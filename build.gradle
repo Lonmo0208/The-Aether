@@ -36,6 +36,12 @@ neoForge {
             systemProperty 'forge.enabledGameTestNamespaces', mod_id
         }
 
+        clientAuth {
+            client()
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
+            devLogin = true
+        }
+
         server {
             server()
             systemProperty 'forge.enabledGameTestNamespaces', mod_id
@@ -76,6 +82,7 @@ dependencies {
     implementation "com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}"
     implementation "com.aetherteam.cumulus:cumulus_menus:${project.cumulus_version}"
     implementation "io.wispforest:accessories-neoforge:${project.accessories_dev_version}+${project.minecraft_version}"
+    implementation("gg.essential:partner-mod-integration-1.21.1-neoforge:${project.essential_partner_integration_version}")
 
     jarJar("com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}") {
         version {
@@ -95,6 +102,13 @@ dependencies {
         version {
             strictly "[${project.accessories_prod_version}+${project.minecraft_version},)"
             prefer "${project.accessories_prod_version}+${project.minecraft_version}"
+        }
+    }
+
+    jarJar("gg.essential:partner-mod-integration-1.21.1-neoforge:-${project.essential_partner_integration_version}") {
+        version {
+            strictly "[${project.essential_partner_integration_version},)"
+            prefer "${project.essential_partner_integration_version}"
         }
     }
 
@@ -128,6 +142,7 @@ repositories {
     maven { url = "https://maven.fabricmc.net" }
     maven { url = "https://maven.su5ed.dev/releases" }
     maven { url = "https://maven.architectury.dev/" }
+    maven { url = "https://repo.essential.gg/public" }
     maven { url = "https://packages.aether-mod.net/Nitrogen" }
     maven { url = "https://packages.aether-mod.net/Cumulus" }
     mavenLocal()
@@ -226,7 +241,7 @@ modrinth {
     loaders = ["neoforge"]
     dependencies {
         required.project "owo-lib"
-        embedded.version "accessories", "${project.accessories_dev_version}+${project.minecraft_version}"
+        embedded.version "accessories", "${project.accessories_prod_version}+${project.minecraft_version}"
         embedded.version "cumulus", "${project.cumulus_version}"
     }
 }

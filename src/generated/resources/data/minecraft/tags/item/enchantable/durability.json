@@ -1,7 +1,8 @@
 {
   "values": [
+    "#aether:dart_shooters",
     "#aether:accessories_gloves",
-    "aether:hammer_of_kingbdogz",
+    "#aether:tools/hammers",
     "aether:lightning_knife",
     "aether:zanite_ring",
     "aether:ice_ring",
@@ -10,6 +11,7 @@
     "aether:shield_of_repulsion",
     "aether:cold_parachute",
     "aether:golden_parachute",
-    "aether:nature_staff"
+    "aether:nature_staff",
+    "aether:cloud_staff"
   ]
 }

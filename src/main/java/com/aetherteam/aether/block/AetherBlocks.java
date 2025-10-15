@@ -313,6 +313,8 @@ public class AetherBlocks {
                 return new EntityBlockItem(block.get(), ChestMimicBlockEntity::new, new Item.Properties());
             } else if (block == TREASURE_CHEST) {
                 return new EntityBlockItem(block.get(), TreasureChestBlockEntity::new, new Item.Properties());
+            } else if (block == SKYROOT_DOOR) {
+                return new DoubleHighBlockItem(block.get(), new Item.Properties());
             } else if (block == SUN_ALTAR) {
                 return new BlockItem(block.get(), new Item.Properties().fireResistant());
             } else if (block == SKYROOT_BED) {

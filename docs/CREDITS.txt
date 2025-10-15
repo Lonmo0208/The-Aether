@@ -37,9 +37,13 @@ cassiancc
 CDAGaming:
 - Fixes to the Aether main menu.
 
+Cicopath
+- Further integration with Just Enough Effect Descriptions.
+
 darksonic300
 - Implementation of the is_cold damage type tag.
 - Changing aetherSurfaceRules() method to be public.
+- Changing Inebriation to not affect flying Creative and Spectator players.
 
 embeddedt
 - Fixes to make entity dimension falling checks more performant.
@@ -104,7 +108,7 @@ mrjasonn
 muzikbike
 - Contribution of the reference JSON for an improved Aercloud block model.
 
-parasdice
+AriaElidove
 - Contribution of the beta Lootr Mimic texture.
 
 rhysdh540
