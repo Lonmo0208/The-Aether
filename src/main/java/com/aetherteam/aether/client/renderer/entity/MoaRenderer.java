@@ -32,6 +32,7 @@ public class MoaRenderer extends MobRenderer<Moa, MoaModel> {
         this.addLayer(new MoaHatEmissiveLayer(this, new MoaModel(context.bakeLayer(AetherModelLayers.MOA_HAT))));
         this.addLayer(new MoaSaddleLayer(this, new MoaModel(context.bakeLayer(AetherModelLayers.MOA_SADDLE))));
         this.addLayer(new MoaSaddleEmissiveLayer(this, new MoaModel(context.bakeLayer(AetherModelLayers.MOA_SADDLE))));
+        this.addLayer(new MoaEffectsLayer(this, new MoaModel(context.bakeLayer(AetherModelLayers.MOA_EFFECTS))));
     }
 
     /**

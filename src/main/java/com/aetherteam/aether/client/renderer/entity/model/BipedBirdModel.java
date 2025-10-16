@@ -11,6 +11,8 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 
+import java.util.List;
+
 public abstract class BipedBirdModel<T extends Entity & WingedBird & NotGrounded> extends EntityModel<T> {
     public final ModelPart head;
     public final ModelPart jaw;
@@ -42,7 +44,7 @@ public abstract class BipedBirdModel<T extends Entity & WingedBird & NotGrounded
         MeshDefinition meshDefinition = new MeshDefinition();
         PartDefinition partDefinition = meshDefinition.getRoot();
         PartDefinition head = partDefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 13).addBox(-2.0F, -4.0F, -6.0F, 4.0F, 4.0F, 8.0F, cube, 0.5F, 0.5F), PartPose.offset(0.0F, 8.0F, -4.0F));
-        head.addOrReplaceChild("jaw", CubeListBuilder.create().texOffs(24, 13).addBox(-2.0F, -1.0F, -6.0F, 4.0F, 1.0F, 8.0F, new CubeDeformation(-0.1F), 0.5F, 0.5F), PartPose.ZERO);
+        head.addOrReplaceChild("jaw", CubeListBuilder.create().texOffs(24, 13).addBox(-2.0F, -1.0F, -6.0F, 4.0F, 1.0F, 8.0F, cube.extend(-0.1F), 0.5F, 0.5F), PartPose.ZERO);
         head.addOrReplaceChild("neck", CubeListBuilder.create().texOffs(22, 0).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 6.0F, 2.0F, cube, 0.5F, 0.5F), PartPose.ZERO);
         PartDefinition body = partDefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -3.0F, 0.0F, 6.0F, 8.0F, 5.0F, cube, 0.5F, 0.5F), PartPose.offsetAndRotation(0.0F, 16.0F, 0.0F, Mth.HALF_PI, 0.0F, 0.0F));
         partDefinition.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(54, 21).addBox(-0.99F, -1.0F, -1.0F, 2.0F, 9.0F, 2.0F, cube, 0.5F, 0.5F), PartPose.offset(-2.0F, 16.0F, 1.0F));
@@ -95,5 +97,9 @@ public abstract class BipedBirdModel<T extends Entity & WingedBird & NotGrounded
         this.rightTailFeather.render(poseStack, consumer, packedLight, packedOverlay, color);
         this.middleTailFeather.render(poseStack, consumer, packedLight, packedOverlay, color);
         this.leftTailFeather.render(poseStack, consumer, packedLight, packedOverlay, color);
+    }
+
+    public List<ModelPart> parts() {
+        return List.of(this.head, this.body, this.rightLeg, this.leftLeg, this.rightTailFeather, this.middleTailFeather, this.leftTailFeather);
     }
 }

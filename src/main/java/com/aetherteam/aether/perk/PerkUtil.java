@@ -15,6 +15,13 @@ public final class PerkUtil {
     }
 
     /**
+     * @return A {@link Predicate} to check if a {@link User} has access to Arkenzus-tier Moa skins for a lifetime period.
+     */
+    public static Predicate<User> hasLifetimeArkenzusMoaSkins() {
+        return (user) -> hasAllSkins().test(user) || user.getCurrentTierLevel() >= User.Tier.ARKENZUS.getLevel() || (user.getCurrentTier() == null && user.getHighestPastTierLevel() >= User.Tier.ARKENZUS.getLevel());
+    }
+
+    /**
      * @return A {@link Predicate} to check if a {@link User} has access to Valkyrie-tier Moa skins for a lifetime period.
      */
     public static Predicate<User> hasLifetimeValkyrieMoaSkins() {
@@ -26,6 +33,13 @@ public final class PerkUtil {
      */
     public static Predicate<User> hasLifetimeAscentanMoaSkins() {
         return (user) -> hasAllSkins().test(user) || hasBaseSkins().test(user) || user.getCurrentTierLevel() >= User.Tier.ASCENTAN.getLevel() || (user.getCurrentTier() == null && user.getHighestPastTierLevel() >= User.Tier.ASCENTAN.getLevel());
+    }
+
+    /**
+     * @return A {@link Predicate} to check if a {@link User} has access to Arkenzus-tier Moa skins.
+     */
+    public static Predicate<User> hasArkenzusMoaSkins() {
+        return (user) -> hasAllSkins().test(user) || user.getCurrentTierLevel() >= User.Tier.ARKENZUS.getLevel();
     }
 
     /**
