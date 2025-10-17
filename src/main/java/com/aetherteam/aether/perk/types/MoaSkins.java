@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -361,7 +362,7 @@ public class MoaSkins {
             .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
             .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/pottery_moa_icon"))
             .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/pottery_moa/pottery_moa.png"))
-            .subRenderer(new PotteryMoaSubRenderer())
+            .subRenderer(FMLEnvironment.dist == Dist.CLIENT ? new PotteryMoaSubRenderer() : null)
             .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
         ));
         register("void_moa", new MoaSkin("void_moa", new MoaSkin.Properties()
@@ -369,7 +370,7 @@ public class MoaSkins {
             .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
             .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/void_moa_icon"))
             .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/void_moa/void_moa.png"))
-            .subRenderer(new VoidMoaSubRenderer())
+            .subRenderer(FMLEnvironment.dist == Dist.CLIENT ? new VoidMoaSubRenderer() : null)
             .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
         ));
         register("galaxian_moa", new MoaSkin("galaxian_moa", new MoaSkin.Properties()
@@ -377,7 +378,7 @@ public class MoaSkins {
             .userPredicate((user) -> PerkUtil.hasArkenzusMoaSkins().test(user))
             .iconLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "skins/icons/galaxian_moa_icon"))
             .skinLocation(ResourceLocation.fromNamespaceAndPath(Aether.MODID, "textures/entity/mobs/moa/skins/galaxian_moa/galaxian_moa.png"))
-            .subRenderer(new GalaxianMoaSubRenderer())
+            .subRenderer(FMLEnvironment.dist == Dist.CLIENT ? new GalaxianMoaSubRenderer() : null)
             .info(new MoaSkin.Info(User.Tier.ARKENZUS, false))
         ));
     }

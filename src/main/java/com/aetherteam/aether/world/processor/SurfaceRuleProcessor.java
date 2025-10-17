@@ -1,5 +1,6 @@
 package com.aetherteam.aether.world.processor;
 
+import com.aetherteam.aether.Aether;
 import com.aetherteam.aether.AetherTags;
 import com.aetherteam.aether.block.AetherBlocks;
 import com.aetherteam.aether.mixin.mixins.common.accessor.ChunkAccessAccessor;
@@ -40,26 +41,67 @@ public class SurfaceRuleProcessor extends StructureProcessor {
     @Nullable
     @Override
     @SuppressWarnings("deprecation")
+
     public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos origin, BlockPos centerBottom, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo modifiedBlockInfo, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
+        if (level instanceof WorldGenRegion) {
+            return modifiedBlockInfo;
+        }
+
         if (level instanceof WorldGenLevel worldGenLevel) {
             // If the processor is running outside the center chunk, return immediately.
             if (worldGenLevel instanceof WorldGenRegion region && BlockLogicUtil.isOutOfBounds(modifiedBlockInfo.pos(), region.getCenter())) {
                 return modifiedBlockInfo;
             }
+
+            // 增强区块可用性检查
+            if (worldGenLevel instanceof WorldGenRegion region) {
+                int chunkX = modifiedBlockInfo.pos().getX() >> 4;
+                int chunkZ = modifiedBlockInfo.pos().getZ() >> 4;
+
+                // 更严格的区块检查
+                if (!region.hasChunk(chunkX, chunkZ)) {
+                    return modifiedBlockInfo;
+                }
+
+                // 检查区块是否已经完全生成
+                ChunkAccess chunk = region.getChunk(chunkX, chunkZ);
+                if (chunk == null) {
+                    return modifiedBlockInfo;
+                }
+            }
+
             if (worldGenLevel.getChunkSource() instanceof ServerChunkCache serverChunkCache) {
                 if (serverChunkCache.getGenerator() instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
                     NoiseGeneratorSettings settingsHolder = noiseBasedChunkGenerator.generatorSettings().value();
                     SurfaceRules.RuleSource surfaceRule = settingsHolder.surfaceRule();
-                    ChunkAccess chunkAccess = worldGenLevel.getChunk(modifiedBlockInfo.pos());
-                    NoiseChunk noisechunk = ((ChunkAccessAccessor) chunkAccess).aether$getNoiseChunk();
-                    if (noisechunk != null) {
-                        CarvingContext carvingcontext = new CarvingContext(noiseBasedChunkGenerator, worldGenLevel.registryAccess(), chunkAccess.getHeightAccessorForGeneration(), noisechunk, serverChunkCache.randomState(), surfaceRule);
-                        Optional<BlockState> state = carvingcontext.topMaterial(worldGenLevel.getBiomeManager()::getNoiseBiomeAtPosition, chunkAccess, modifiedBlockInfo.pos(), false);
-                        if (state.isPresent()) {
-                            if (modifiedBlockInfo.state().is(AetherTags.Blocks.AETHER_DIRT) && !modifiedBlockInfo.state().is(AetherBlocks.AETHER_DIRT.get()) && state.get().is(AetherTags.Blocks.AETHER_DIRT)) {
-                                return new StructureTemplate.StructureBlockInfo(modifiedBlockInfo.pos(), state.get(), null);
+
+                    try {
+                        // 在获取区块前再次检查可用性
+                        if (!worldGenLevel.hasChunk(modifiedBlockInfo.pos().getX() >> 4, modifiedBlockInfo.pos().getZ() >> 4)) {
+                            return modifiedBlockInfo;
+                        }
+
+                        ChunkAccess chunkAccess = worldGenLevel.getChunk(modifiedBlockInfo.pos());
+                        NoiseChunk noisechunk = ((ChunkAccessAccessor) chunkAccess).aether$getNoiseChunk();
+
+                        // 确保noiseChunk不为null
+                        if (noisechunk != null) {
+                            CarvingContext carvingcontext = new CarvingContext(noiseBasedChunkGenerator, worldGenLevel.registryAccess(), chunkAccess.getHeightAccessorForGeneration(), noisechunk, serverChunkCache.randomState(), surfaceRule);
+                            Optional<BlockState> state = carvingcontext.topMaterial(worldGenLevel.getBiomeManager()::getNoiseBiomeAtPosition, chunkAccess, modifiedBlockInfo.pos(), false);
+                            if (state.isPresent()) {
+                                if (modifiedBlockInfo.state().is(AetherTags.Blocks.AETHER_DIRT) && !modifiedBlockInfo.state().is(AetherBlocks.AETHER_DIRT.get()) && state.get().is(AetherTags.Blocks.AETHER_DIRT)) {
+                                    return new StructureTemplate.StructureBlockInfo(modifiedBlockInfo.pos(), state.get(), null);
+                                }
                             }
                         }
+                    } catch (IllegalStateException e) {
+                        // 记录错误但不崩溃
+                        Aether.LOGGER.debug("Failed to process surface rule at {}: {}", modifiedBlockInfo.pos(), e.getMessage());
+                        return modifiedBlockInfo;
+                    } catch (Exception e) {
+                        // 捕获所有其他异常
+                        Aether.LOGGER.debug("Unexpected error during surface rule processing at {}: {}", modifiedBlockInfo.pos(), e.getMessage());
+                        return modifiedBlockInfo;
                     }
                 }
             }
