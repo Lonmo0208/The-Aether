@@ -22,6 +22,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -42,28 +43,21 @@ public class SurfaceRuleProcessor extends StructureProcessor {
     @Override
     @SuppressWarnings("deprecation")
 
-    public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos origin, BlockPos centerBottom, StructureTemplate.StructureBlockInfo originalBlockInfo, StructureTemplate.StructureBlockInfo modifiedBlockInfo, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
-        if (level instanceof WorldGenRegion) {
-            return modifiedBlockInfo;
-        }
-
+    public StructureTemplate.StructureBlockInfo process(@NotNull LevelReader level, @NotNull BlockPos origin, @NotNull BlockPos centerBottom, StructureTemplate.@NotNull StructureBlockInfo originalBlockInfo, StructureTemplate.@NotNull StructureBlockInfo modifiedBlockInfo, @NotNull StructurePlaceSettings settings, @Nullable StructureTemplate template) {
         if (level instanceof WorldGenLevel worldGenLevel) {
             // If the processor is running outside the center chunk, return immediately.
             if (worldGenLevel instanceof WorldGenRegion region && BlockLogicUtil.isOutOfBounds(modifiedBlockInfo.pos(), region.getCenter())) {
                 return modifiedBlockInfo;
             }
 
-            // 增强区块可用性检查
             if (worldGenLevel instanceof WorldGenRegion region) {
                 int chunkX = modifiedBlockInfo.pos().getX() >> 4;
                 int chunkZ = modifiedBlockInfo.pos().getZ() >> 4;
 
-                // 更严格的区块检查
                 if (!region.hasChunk(chunkX, chunkZ)) {
                     return modifiedBlockInfo;
                 }
 
-                // 检查区块是否已经完全生成
                 ChunkAccess chunk = region.getChunk(chunkX, chunkZ);
                 if (chunk == null) {
                     return modifiedBlockInfo;
@@ -76,7 +70,6 @@ public class SurfaceRuleProcessor extends StructureProcessor {
                     SurfaceRules.RuleSource surfaceRule = settingsHolder.surfaceRule();
 
                     try {
-                        // 在获取区块前再次检查可用性
                         if (!worldGenLevel.hasChunk(modifiedBlockInfo.pos().getX() >> 4, modifiedBlockInfo.pos().getZ() >> 4)) {
                             return modifiedBlockInfo;
                         }
@@ -84,7 +77,6 @@ public class SurfaceRuleProcessor extends StructureProcessor {
                         ChunkAccess chunkAccess = worldGenLevel.getChunk(modifiedBlockInfo.pos());
                         NoiseChunk noisechunk = ((ChunkAccessAccessor) chunkAccess).aether$getNoiseChunk();
 
-                        // 确保noiseChunk不为null
                         if (noisechunk != null) {
                             CarvingContext carvingcontext = new CarvingContext(noiseBasedChunkGenerator, worldGenLevel.registryAccess(), chunkAccess.getHeightAccessorForGeneration(), noisechunk, serverChunkCache.randomState(), surfaceRule);
                             Optional<BlockState> state = carvingcontext.topMaterial(worldGenLevel.getBiomeManager()::getNoiseBiomeAtPosition, chunkAccess, modifiedBlockInfo.pos(), false);
@@ -95,11 +87,9 @@ public class SurfaceRuleProcessor extends StructureProcessor {
                             }
                         }
                     } catch (IllegalStateException e) {
-                        // 记录错误但不崩溃
                         Aether.LOGGER.debug("Failed to process surface rule at {}: {}", modifiedBlockInfo.pos(), e.getMessage());
                         return modifiedBlockInfo;
                     } catch (Exception e) {
-                        // 捕获所有其他异常
                         Aether.LOGGER.debug("Unexpected error during surface rule processing at {}: {}", modifiedBlockInfo.pos(), e.getMessage());
                         return modifiedBlockInfo;
                     }
@@ -110,7 +100,7 @@ public class SurfaceRuleProcessor extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType<?> getType() {
+    protected @NotNull StructureProcessorType<?> getType() {
         return AetherStructureProcessors.SURFACE_RULE.get();
     }
 }
