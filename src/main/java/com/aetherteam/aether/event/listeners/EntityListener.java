@@ -7,6 +7,7 @@ import io.wispforest.accessories.api.events.OnDeathCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -46,13 +47,23 @@ public class EntityListener {
         EntityEvents.STRUCK_BY_LIGHTNING.register(EntityListener::onLightningStrike);
         LivingEntityEvents.ON_EXPERIENCE_DROP.register((entity, attackingPlayer, helper) -> onDropExperience(entity, helper));
         LivingEntityEvents.ON_EFFECT.register((entity, instance, result) -> EntityListener.onEffectApply(entity, instance));
-        // SlimeMixin.aetherFabric$dontSplitForSwets -> EntityHooks.preventSplit
-        //bus.addListener(EntityListener::onLoadPlayerFile);
 
         OnDeathCallback.EVENT.register((currentState, entity, capability, damageSource, droppedStacks) -> {
             List<ItemStack> droppedStacksCopy = new ArrayList<>(droppedStacks);
             boolean recentlyHit = entity.hurtMarked;
-            int looting = EnchantmentHelper.getEnchantmentLevel(entity.level().registryAccess().aetherFabric$holderOrThrow(Enchantments.LOOTING), entity);
+
+            int looting = 0;
+            if (entity.level() != null) {
+                var registryAccess = entity.level().registryAccess();
+                var enchantmentRegistry = registryAccess.registry(Registries.ENCHANTMENT);
+                if (enchantmentRegistry.isPresent()) {
+                    var holder = enchantmentRegistry.get().getHolder(Enchantments.LOOTING);
+                    if (holder.isPresent()) {
+                        looting = EnchantmentHelper.getEnchantmentLevel(holder.get(), entity);
+                    }
+                }
+            }
+
             droppedStacks.clear();
             droppedStacks.addAll(EntityHooks.handleEntityAccessoryDrops(entity, droppedStacksCopy, recentlyHit, looting));
             return TriState.DEFAULT;
