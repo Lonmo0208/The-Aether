@@ -8,6 +8,7 @@ import io.wispforest.accessories.api.AccessoriesContainer;
 import io.wispforest.accessories.api.slot.SlotEntryReference;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -48,10 +49,10 @@ public interface PhoenixArmor {
             }
             if (entity.level() instanceof ServerLevel level) {
                 level.sendParticles(ParticleTypes.FLAME,
-                        entity.getX() + (level.getRandom().nextGaussian() / 5.0),
-                        entity.getY() + (level.getRandom().nextGaussian() / 3.0),
-                        entity.getZ() + (level.getRandom().nextGaussian() / 5.0),
-                        1, 0.0, 0.0, 0.0, 0.0F);
+                    entity.getX() + (level.getRandom().nextGaussian() / 5.0),
+                    entity.getY() + (level.getRandom().nextGaussian() / 3.0),
+                    entity.getZ() + (level.getRandom().nextGaussian() / 5.0),
+                    1, 0.0, 0.0, 0.0, 0.0F);
             }
         }
         if (!EquipmentUtil.hasFullPhoenixSet(entity) || !entity.isInLava()) {
@@ -100,7 +101,12 @@ public interface PhoenixArmor {
      */
     private static float boostWithDepthStrider(LivingEntity entity, float start, float increment) {
         float defaultBoost = start;
-        float depthStriderModifier = Math.min(EnchantmentHelper.getEnchantmentLevel(entity.level().registryAccess().aetherFabric$holderOrThrow(Enchantments.DEPTH_STRIDER), entity), 3.0F);
+        var registryAccess = entity.level().registryAccess();
+        var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+        var depthStriderHolder = enchantmentLookup.getOrThrow(Enchantments.DEPTH_STRIDER);
+
+        float depthStriderModifier = Math.min(EnchantmentHelper.getEnchantmentLevel(depthStriderHolder, entity), 3.0F);
+
         if (depthStriderModifier > 0.0F) {
             defaultBoost += depthStriderModifier * increment;
         }

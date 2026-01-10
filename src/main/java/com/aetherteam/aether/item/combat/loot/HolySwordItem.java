@@ -4,6 +4,7 @@ import com.aetherteam.aether.Aether;
 import com.aetherteam.aether.item.AetherItems;
 import com.aetherteam.aether.item.EquipmentUtil;
 import com.aetherteam.aether.item.combat.AetherItemTiers;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
@@ -45,8 +47,14 @@ public class HolySwordItem extends SwordItem {
         float damage = newDamage.floatValue();
         if (canPerformAbility(target, damageSource)) {
             ItemStack itemStack = target.getMainHandItem();
+
+            var registryAccess = target.level().registryAccess();
+            var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+            var smiteHolder = enchantmentLookup.getOrThrow(Enchantments.SMITE);
+
+            int smiteModifier = EnchantmentHelper.getItemEnchantmentLevel(smiteHolder, itemStack);
+
             float bonus = 8.25F;
-            int smiteModifier = itemStack.aetherFabric$getEnchantmentLevel(target.level().registryAccess().aetherFabric$holderOrThrow(Enchantments.SMITE));
             if (smiteModifier > 0) {
                 bonus += (smiteModifier * 2.5F);
             }

@@ -88,7 +88,7 @@ public class EntityHooks {
     public static boolean canMobSpawnWithAccessories(Entity entity) {
         EntityType<?> entityType = entity.getType();
         return entity instanceof Mob &&
-                (entityType == EntityType.ZOMBIE || entityType == EntityType.ZOMBIE_VILLAGER || entityType == EntityType.HUSK || entityType == EntityType.SKELETON || entityType == EntityType.STRAY || entityType == EntityType.PIGLIN);
+            (entityType == EntityType.ZOMBIE || entityType == EntityType.ZOMBIE_VILLAGER || entityType == EntityType.HUSK || entityType == EntityType.SKELETON || entityType == EntityType.STRAY || entityType == EntityType.PIGLIN);
     }
 
     /**
@@ -214,7 +214,18 @@ public class EntityHooks {
                 if (accessoriesContainer != null) {
                     ItemStack itemStack = accessoriesContainer.getAccessories().getItem(0);
                     if (!itemStack.isEmpty() && random.nextFloat() < 0.5F * chanceMultiplier) {
-                        accessoriesContainer.getAccessories().setItem(0, EnchantmentHelper.enchantItem(random, itemStack, (int) (5.0F + chanceMultiplier * (float) random.nextInt(18)), mob.registryAccess(), Optional.of(mob.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT))));
+                        // 修复1：使用标准 API 而不是扩展方法
+                        var registryAccess = mob.registryAccess();
+                        var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+                        var spawnEquipmentHolder = enchantmentLookup.getOrThrow(EnchantmentTags.ON_MOB_SPAWN_EQUIPMENT);
+
+                        accessoriesContainer.getAccessories().setItem(0, EnchantmentHelper.enchantItem(
+                            random,
+                            itemStack,
+                            (int) (5.0F + chanceMultiplier * (float) random.nextInt(18)),
+                            registryAccess,
+                            Optional.of(spawnEquipmentHolder)
+                        ));
                     }
                 }
             }
@@ -232,6 +243,8 @@ public class EntityHooks {
      */
     public static boolean dismountPrevention(Entity rider, Entity mount, boolean dismounting) {
         if (dismounting && rider.isShiftKeyDown()) {
+            // 注意：这里还有 aetherFabric$isInFluidType 扩展方法
+            // 如果它也有问题，可能需要单独修复
             return (mount instanceof MountableAnimal && !mount.onGround() && !mount.aetherFabric$isInFluidType() && !mount.isPassenger()) || (mount instanceof Swet swet && !swet.isFriendly());
         }
         return false;
@@ -408,21 +421,21 @@ public class EntityHooks {
         SlotTypeReference capeIdentifier = CapeItem.getStaticIdentifier();
         SlotTypeReference shieldIdentifier = ShieldOfRepulsionItem.getStaticIdentifier();
         if (!getItemByIdentifier(armorStand, glovesIdentifier).isEmpty()
-                && Math.abs(front) >= (isSmall ? 0.15 : 0.2)
-                && vertical >= (isSmall ? 0.65 : 0.75)
-                && vertical < 1.15) {
+            && Math.abs(front) >= (isSmall ? 0.15 : 0.2)
+            && vertical >= (isSmall ? 0.65 : 0.75)
+            && vertical < 1.15) {
             return glovesIdentifier;
         } else if (!getItemByIdentifier(armorStand, pendantIdentifier).isEmpty()
-                && vertical >= (isSmall ? 1.2 : 1.3)
-                && vertical < 0.9 + (isSmall ? 0.8 : 0.6)) {
+            && vertical >= (isSmall ? 1.2 : 1.3)
+            && vertical < 0.9 + (isSmall ? 0.8 : 0.6)) {
             return pendantIdentifier;
         } else if (!getItemByIdentifier(armorStand, capeIdentifier).isEmpty()
-                && vertical >= (isSmall ? 1.0 : 1.1)
-                && vertical < (isSmall ? 1.7 : 1.4)) {
+            && vertical >= (isSmall ? 1.0 : 1.1)
+            && vertical < (isSmall ? 1.7 : 1.4)) {
             return capeIdentifier;
         } else if (!getItemByIdentifier(armorStand, shieldIdentifier).isEmpty()
-                && vertical >= (isSmall ? 0.9 : 1.0)
-                && vertical < (isSmall ? 1.5 : 1.2)) {
+            && vertical >= (isSmall ? 0.9 : 1.0)
+            && vertical < (isSmall ? 1.5 : 1.2)) {
             return shieldIdentifier;
         }
         return null;
@@ -525,11 +538,21 @@ public class EntityHooks {
                     if (!itemStack.isEmpty()) {
                         itemStacks.removeIf((stack) -> ItemStack.isSameItemSameComponents(stack, itemStack));
                     }
-                    if (!itemStack.isEmpty() && itemStack.aetherFabric$getEnchantmentLevel(entity.level().registryAccess().aetherFabric$holderOrThrow(Enchantments.VANISHING_CURSE)) == 0 && recentlyHit && Math.max(mob.getRandom().nextFloat() - (float) looting * 0.01F, 0.0F) < f) {
-                        if (!flag && itemStack.isDamageableItem()) {
-                            itemStack.setDamageValue(itemStack.getMaxDamage() - mob.getRandom().nextInt(1 + mob.getRandom().nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))));
+                    if (!itemStack.isEmpty()) {
+                        // 修复2：使用标准 API 而不是扩展方法
+                        var registryAccess = entity.level().registryAccess();
+                        var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+                        var vanishingCurseHolder = enchantmentLookup.getOrThrow(Enchantments.VANISHING_CURSE);
+
+                        // 修复3：使用标准方法获取附魔等级
+                        int vanishingCurseLevel = EnchantmentHelper.getItemEnchantmentLevel(vanishingCurseHolder, itemStack);
+
+                        if (vanishingCurseLevel == 0 && recentlyHit && Math.max(mob.getRandom().nextFloat() - (float) looting * 0.01F, 0.0F) < f) {
+                            if (!flag && itemStack.isDamageableItem()) {
+                                itemStack.setDamageValue(itemStack.getMaxDamage() - mob.getRandom().nextInt(1 + mob.getRandom().nextInt(Math.max(itemStack.getMaxDamage() - 3, 1))));
+                            }
+                            itemStacks.add(itemStack);
                         }
-                        itemStacks.add(itemStack);
                     }
                 }
             }

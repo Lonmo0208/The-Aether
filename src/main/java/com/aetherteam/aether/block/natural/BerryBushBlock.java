@@ -4,6 +4,7 @@ import com.aetherteam.aether.AetherConfig;
 import com.aetherteam.aether.block.AetherBlockStateProperties;
 import com.aetherteam.aether.block.AetherBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -87,7 +89,17 @@ public class BerryBushBlock extends AetherBushBlock {
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        if (tool.aetherFabric$getEnchantmentLevel(level.registryAccess().aetherFabric$holderOrThrow(Enchantments.SILK_TOUCH)) <= 0) {
+
+        // 修复：使用标准 API 而不是扩展方法
+        // 获取注册表访问器
+        var registryAccess = level.registryAccess();
+        var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+        var silkTouchHolder = enchantmentLookup.getOrThrow(Enchantments.SILK_TOUCH);
+
+        // 使用标准方法获取附魔等级
+        int silkTouchLevel = EnchantmentHelper.getItemEnchantmentLevel(silkTouchHolder, tool);
+
+        if (silkTouchLevel <= 0) {
             level.setBlock(pos, AetherBlocks.BERRY_BUSH_STEM.get().defaultBlockState().setValue(AetherBlockStateProperties.DOUBLE_DROPS, state.getValue(AetherBlockStateProperties.DOUBLE_DROPS)), 1 | 2);
             if (AetherConfig.SERVER.berry_bush_consistency.get()) { // Destroy stem too if config is enabled.
                 level.destroyBlock(pos, true, player);

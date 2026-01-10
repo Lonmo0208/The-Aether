@@ -4,6 +4,7 @@ import com.aetherteam.aether.Aether;
 import com.aetherteam.aether.item.AetherItems;
 import com.aetherteam.aether.item.EquipmentUtil;
 import com.aetherteam.aether.item.combat.AetherItemTiers;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -37,7 +38,13 @@ public class FlamingSwordItem extends SwordItem {
                 ItemStack heldStack = attacker.getMainHandItem();
                 if (heldStack.is(AetherItems.FLAMING_SWORD.get())) {
                     int defaultTime = 30;
-                    int fireAspectModifier = EnchantmentHelper.getEnchantmentLevel(attacker.level().registryAccess().aetherFabric$holderOrThrow(Enchantments.FIRE_ASPECT), attacker);
+
+                    var registryAccess = attacker.level().registryAccess();
+                    var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+                    var fireAspectHolder = enchantmentLookup.getOrThrow(Enchantments.FIRE_ASPECT);
+
+                    int fireAspectModifier = EnchantmentHelper.getEnchantmentLevel(fireAspectHolder, attacker);
+
                     if (fireAspectModifier > 0) {
                         defaultTime += (fireAspectModifier * 4);
                     }

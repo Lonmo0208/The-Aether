@@ -5,6 +5,7 @@ import com.aetherteam.aether.entity.projectile.weapon.ThrownLightningKnife;
 import com.aetherteam.aether.item.AetherItems;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -38,7 +40,13 @@ public class LightningKnifeItem extends Item implements ProjectileItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack heldStack = player.getItemInHand(hand);
         if (!level.isClientSide()) {
-            if (!player.getAbilities().instabuild && heldStack.aetherFabric$getEnchantmentLevel(level.registryAccess().aetherFabric$holderOrThrow(Enchantments.INFINITY)) == 0) { // Note: Lightning knives can't be enchanted with Infinity in survival, but we still implement the behavior.
+            var registryAccess = level.registryAccess();
+            var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+            var infinityHolder = enchantmentLookup.getOrThrow(Enchantments.INFINITY);
+
+            int infinityLevel = EnchantmentHelper.getItemEnchantmentLevel(infinityHolder, heldStack);
+
+            if (!player.getAbilities().instabuild && infinityLevel == 0) { // Note: Lightning knives can't be enchanted with Infinity in survival, but we still implement the behavior.
                 heldStack.shrink(1);
             }
             ThrownLightningKnife lightningKnife = new ThrownLightningKnife(player, level);

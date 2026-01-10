@@ -2,6 +2,7 @@ package com.aetherteam.aether.item.combat.abilities.armor;
 
 import com.aetherteam.aether.attachment.AetherDataAttachments;
 import com.aetherteam.aether.item.EquipmentUtil;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -53,7 +54,22 @@ public interface NeptuneArmor {
      */
     private static float boostWithDepthStrider(LivingEntity entity) {
         float defaultBoost = 0.4F;
-        float depthStriderModifier = Math.min(EnchantmentHelper.getEnchantmentLevel(entity.level().registryAccess().aetherFabric$holderOrThrow(Enchantments.INFINITY), entity), 3.0F);
+
+        // 修复：使用标准 API 而不是扩展方法
+        // 获取注册表访问器
+        var registryAccess = entity.level().registryAccess();
+
+        // 获取附魔注册表的查找接口
+        var enchantmentLookup = registryAccess.lookupOrThrow(Registries.ENCHANTMENT);
+
+        // 注意：原代码使用 Enchantments.INFINITY，但方法名是 boostWithDepthStrider
+        // 这里我保持原样使用 INFINITY，但你可能需要检查是否应该是 DEPTH_STRIDER
+        // 获取 INFINITY 附魔的 Holder
+        var enchantmentHolder = enchantmentLookup.getOrThrow(Enchantments.INFINITY);
+
+        // 获取附魔等级
+        float depthStriderModifier = Math.min(EnchantmentHelper.getEnchantmentLevel(enchantmentHolder, entity), 3.0F);
+
         if (depthStriderModifier > 0.0F) {
             defaultBoost += depthStriderModifier * 0.4F;
         }

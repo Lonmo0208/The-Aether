@@ -9,6 +9,7 @@ import com.aetherteam.aether.loot.functions.SpawnXP;
 import com.aetherteam.nitrogen.data.providers.NitrogenBlockLootSubProvider;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -60,109 +61,137 @@ public abstract class AetherBlockLootSubProvider extends NitrogenBlockLootSubPro
 
     public LootTable.Builder droppingDouble(ItemLike item) {
         return LootTable.lootTable().withPool(this.applyExplosionCondition(item, LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                        .add(LootItem.lootTableItem(item))))
-                .apply(DoubleDrops.builder());
+                .add(LootItem.lootTableItem(item))))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingDouble(Block block, LootItemCondition.Builder conditionBuilder, LootPoolEntryContainer.Builder<?> builder) {
         return LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                        .add(LootItem.lootTableItem(block).when(conditionBuilder).otherwise(builder)))
-                .apply(DoubleDrops.builder());
+                .add(LootItem.lootTableItem(block).when(conditionBuilder).otherwise(builder)))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingWithChancesAndSkyrootSticks(Block block, Block sapling, float... chances) {
-        return createForgeSilkTouchOrShearsDispatchTable(block, this.applyExplosionCondition(block, LootItem.lootTableItem(sapling)).when(BonusLevelTableCondition.bonusLevelFlatChance(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE), chances)))
-                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(HAS_SHEARS.or(this.hasSilkTouch()).invert())
-                        .add(this.applyExplosionDecay(block,
-                                        LootItem.lootTableItem(AetherItems.SKYROOT_STICK.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE), 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))))
-                .apply(DoubleDrops.builder());
+        // 修复1：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
+        return createForgeSilkTouchOrShearsDispatchTable(block, this.applyExplosionCondition(block, LootItem.lootTableItem(sapling)).when(BonusLevelTableCondition.bonusLevelFlatChance(fortuneHolder, chances)))
+            .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(HAS_SHEARS.or(this.hasSilkTouch()).invert())
+                .add(this.applyExplosionDecay(block,
+                        LootItem.lootTableItem(AetherItems.SKYROOT_STICK.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
+                    .when(BonusLevelTableCondition.bonusLevelFlatChance(fortuneHolder, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingGoldenOakLeaves(Block block, Block sapling, float... chances) {
+        // 修复2：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
         return this.droppingWithChancesAndSkyrootSticks(block, sapling, chances)
-                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(HAS_SHEARS.or(this.hasSilkTouch()).invert())
-                        .add(this.applyExplosionCondition(block,
-                                        LootItem.lootTableItem(Items.GOLDEN_APPLE))
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE), 0.00005F, 0.000055555557F, 0.0000625F, 0.00008333334F, 0.00025F))));
+            .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).when(HAS_SHEARS.or(this.hasSilkTouch()).invert())
+                .add(this.applyExplosionCondition(block,
+                        LootItem.lootTableItem(Items.GOLDEN_APPLE))
+                    .when(BonusLevelTableCondition.bonusLevelFlatChance(fortuneHolder, 0.00005F, 0.000055555557F, 0.0000625F, 0.00008333334F, 0.00025F))));
     }
 
     public LootTable.Builder droppingDoubleItemsWithFortune(Block block, Item item) {
+        // 修复3：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
         return createSilkTouchDispatchTable(block, this.applyExplosionDecay(block, LootItem.lootTableItem(item)
-                .apply(ApplyBonusCount.addOreBonusCount(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE)))))
-                .apply(DoubleDrops.builder());
+            .apply(ApplyBonusCount.addOreBonusCount(fortuneHolder))))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingWithSkyrootSticks(Block block) {
+        // 修复4：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
         return createForgeSilkTouchOrShearsDispatchTable(block, this.applyExplosionDecay(block,
-                        LootItem.lootTableItem(AetherItems.SKYROOT_STICK.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
-                .when(BonusLevelTableCondition.bonusLevelFlatChance(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE), 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F)))
-                .apply(DoubleDrops.builder());
+                LootItem.lootTableItem(AetherItems.SKYROOT_STICK.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
+            .when(BonusLevelTableCondition.bonusLevelFlatChance(fortuneHolder, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F)))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingWithFruitAndSkyrootSticks(Block block, Item fruit) {
+        // 修复5：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
         return createForgeSilkTouchOrShearsDispatchTable(block, this.applyExplosionDecay(block, LootItem.lootTableItem(fruit)))
-                .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(HAS_SHEARS.or(this.hasSilkTouch()).invert())
-                        .add(this.applyExplosionDecay(block,
-                                        LootItem.lootTableItem(AetherItems.SKYROOT_STICK.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE), 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))))
-                .apply(DoubleDrops.builder());
+            .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1)).when(HAS_SHEARS.or(this.hasSilkTouch()).invert())
+                .add(this.applyExplosionDecay(block,
+                        LootItem.lootTableItem(AetherItems.SKYROOT_STICK.get()).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
+                    .when(BonusLevelTableCondition.bonusLevelFlatChance(fortuneHolder, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F))))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingDoubleGoldenOak(Block original, Block block, Item item) {
+        // 修复6：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
         return LootTable.lootTable()
-                .withPool(this.applyExplosionDecay(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(original)
-                        .when(this.hasSilkTouch()))))
-                .withPool(this.applyExplosionDecay(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(block)
-                        .when(this.hasSilkTouch().invert()))))
-                .withPool(this.applyExplosionDecay(item, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(item)
-                        .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(AetherTags.Items.GOLDEN_AMBER_HARVESTERS)))
-                        .when(this.hasSilkTouch().invert())
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
-                        .apply(ApplyBonusCount.addOreBonusCount(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE))))))
-                .apply(DoubleDrops.builder());
+            .withPool(this.applyExplosionDecay(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(original)
+                .when(this.hasSilkTouch()))))
+            .withPool(this.applyExplosionDecay(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(block)
+                .when(this.hasSilkTouch().invert()))))
+            .withPool(this.applyExplosionDecay(item, LootPool.lootPool().setRolls(ConstantValue.exactly(1)).add(LootItem.lootTableItem(item)
+                .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(AetherTags.Items.GOLDEN_AMBER_HARVESTERS)))
+                .when(this.hasSilkTouch().invert())
+                .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
+                .apply(ApplyBonusCount.addOreBonusCount(fortuneHolder)))))
+            .apply(DoubleDrops.builder());
     }
 
     public LootTable.Builder droppingBerryBush(Block block, Block stem, Item drop) {
+        // 修复7：获取 FORTUNE 附魔的 Holder
+        var enchantmentLookup = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortuneHolder = enchantmentLookup.getOrThrow(Enchantments.FORTUNE);
+
         return LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                .add(this.applyExplosionDecay(block, LootItem.lootTableItem(drop)
-                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
-                        .apply(ApplyBonusCount.addUniformBonusCount(this.registries.aetherFabric$holderOrThrow(Enchantments.FORTUNE))))
-                .when(this.hasSilkTouch().invert())
-                .apply(DoubleDrops.builder())
+            .add(this.applyExplosionDecay(block, LootItem.lootTableItem(drop)
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
+                .apply(ApplyBonusCount.addUniformBonusCount(fortuneHolder)))
+            .when(this.hasSilkTouch().invert())
+            .apply(DoubleDrops.builder())
         ).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                .add(LootItem.lootTableItem(block))
-                .when(this.hasSilkTouch())
+            .add(LootItem.lootTableItem(block))
+            .when(this.hasSilkTouch())
         ).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                .add(LootItem.lootTableItem(stem)
-                        .when(LootItemEntityPropertyCondition.entityPresent(LootContext.EntityTarget.THIS).invert()))
+            .add(LootItem.lootTableItem(stem)
+                .when(LootItemEntityPropertyCondition.entityPresent(LootContext.EntityTarget.THIS).invert()))
         );
     }
 
     public LootTable.Builder droppingTreasureChest(Block block) {
         return LootTable.lootTable().withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                .add(LootItem.lootTableItem(block)
-                        .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-                        .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                            .include(AetherDataComponents.LOCKED.get())
-                            .include(AetherDataComponents.DUNGEON_KIND.get()))
-                ))
+            .add(LootItem.lootTableItem(block)
+                .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
+                .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                    .include(AetherDataComponents.LOCKED.get())
+                    .include(AetherDataComponents.DUNGEON_KIND.get()))
+            ))
         );
     }
 
     public LootTable.Builder droppingPresentLoot(Block block) {
         return LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                .add(LootItem.lootTableItem(Items.AIR).setWeight(18)
-                        .apply(SpawnTNT.builder()))
-                .add(LootItem.lootTableItem(Items.AIR).setWeight(9)
-                        .apply(SpawnXP.builder()))
-                .add(this.applyExplosionDecay(block, LootItem.lootTableItem(AetherItems.GINGERBREAD_MAN.get()).setWeight(8)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(5.0F, 6.0F)))))
-                .add(this.applyExplosionDecay(block, LootItem.lootTableItem(AetherItems.CANDY_CANE_SWORD.get()).setWeight(1)))
-                .when(this.hasSilkTouch().invert())
+            .add(LootItem.lootTableItem(Items.AIR).setWeight(18)
+                .apply(SpawnTNT.builder()))
+            .add(LootItem.lootTableItem(Items.AIR).setWeight(9)
+                .apply(SpawnXP.builder()))
+            .add(this.applyExplosionDecay(block, LootItem.lootTableItem(AetherItems.GINGERBREAD_MAN.get()).setWeight(8)
+                .apply(SetItemCountFunction.setCount(UniformGenerator.between(5.0F, 6.0F)))))
+            .add(this.applyExplosionDecay(block, LootItem.lootTableItem(AetherItems.CANDY_CANE_SWORD.get()).setWeight(1)))
+            .when(this.hasSilkTouch().invert())
         ).withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
-                .add(LootItem.lootTableItem(block))
-                .when(this.hasSilkTouch())
+            .add(LootItem.lootTableItem(block))
+            .when(this.hasSilkTouch())
         );
     }
 }
