@@ -105,7 +105,7 @@ dependencies {
         }
     }
 
-    jarJar("gg.essential:partner-mod-integration-1.21.1-neoforge:-${project.essential_partner_integration_version}") {
+    jarJar("gg.essential:partner-mod-integration-1.21.1-neoforge:${project.essential_partner_integration_version}") {
         version {
             strictly "[${project.essential_partner_integration_version},)"
             prefer "${project.essential_partner_integration_version}"
