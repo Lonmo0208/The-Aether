@@ -23,6 +23,9 @@ public class MobMixin {
     @ModifyReturnValue(at = @At(value = "RETURN"), method = "canTakeItem(Lnet/minecraft/world/item/ItemStack;)Z")
     private boolean canTakeItem(boolean original, @Local(ordinal = 0, argsOnly = true) ItemStack stack) {
         Mob mob = (Mob) (Object) this;
+        if (mob.getClass().getName().equals("twilightforest.entity.monster.SkeletonDruid")) {
+            return original;
+        }
         if (EntityHooks.canMobSpawnWithAccessories(mob)) {
             SlotTypeReference identifier = AetherMixinHooks.getIdentifierForItem(mob, stack);
             if (identifier != null) {
@@ -42,6 +45,9 @@ public class MobMixin {
     @ModifyReturnValue(at = @At(value = "RETURN"), method = "equipItemIfPossible(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;")
     private ItemStack equipItemIfPossible(ItemStack original, @Local(ordinal = 0, argsOnly = true) ItemStack stack) {
         Mob mob = (Mob) (Object) this;
+        if (mob.getClass().getName().equals("twilightforest.entity.monster.SkeletonDruid")) {
+            return original;
+        }
         var data = mob.getData(AetherDataAttachments.MOB_ACCESSORY);
         SlotTypeReference identifier = AetherMixinHooks.getIdentifierForItem(mob, stack);
         if (identifier != null) {

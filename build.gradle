@@ -81,7 +81,7 @@ configurations {
 dependencies {
     implementation "com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}"
     implementation "com.aetherteam.cumulus:cumulus_menus:${project.cumulus_version}"
-    implementation "io.wispforest:accessories-neoforge:${project.accessories_dev_version}+${project.minecraft_version}"
+    implementation "maven.modrinth:jtmvUHXj:Fb55Fgjz"
     implementation("gg.essential:partner-mod-integration-1.21.1-neoforge:${project.essential_partner_integration_version}")
 
     jarJar("com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}") {
@@ -130,6 +130,11 @@ dependencies {
 }
 
 repositories {
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+    }
+    maven { url = 'https://neoforged.forgecdn.net/releases/' }
     maven { url = "https://jitpack.io" }
     maven { url = "https://maven.blamejared.com" }
     maven { url = "https://maven.theillusivec4.top/" }
